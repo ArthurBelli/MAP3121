@@ -12,6 +12,6 @@ L = np.eye(n)
  
 for i in range (1,n):   
     U[i,i:n] = A[i,i:n] - L[i,1:(i-1)] * U[1:(i-1),i:n]
-    L[(i+1):n,i] = 1/U[i,i] (A[(i+1):n,i] - L[(i+1):n,1:(i-1)] * U[1:(i-1),i])
+    L[(i+1):n,i] = 1/U[i,i] * (A[(i+1):n,i] - L[(i+1):n,1:(i-1)] * U[1:(i-1),i])
 
 ##OBS: ta dando um erro relacionado ao tamanho da matriz
