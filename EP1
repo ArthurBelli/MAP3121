@@ -1,17 +1,25 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+A = np.matrix([[1,2,3],[4,5,6]])
 
 ### decomposição LU
 
-A = np.matrix([[1,2,3],[4,5,6]]) ## deve ser input no projeto final
+def decompLU(A):  
 
-U = np.copy(A)
-n = np.shape(U)[0]
-L = np.eye(n)
- 
-for i in range (1,n):   
-    U[i,i:n] = A[i,i:n] - L[i,1:(i-1)] * U[1:(i-1),i:n]
-    L[(i+1):n,i] = 1/U[i,i] * (A[(i+1):n,i] - L[(i+1):n,1:(i-1)] * U[1:(i-1),i])
+    U = np.copy(A)  
+    n = np.shape(U)[0]  
+    L = np.eye(n)  
 
-##OBS: ta dando um erro relacionado ao tamanho da matriz
+    for j in np.arange(n-1):  
+        for i in np.arange(j+1,n):  
+            L[i,j] = U[i,j]/U[j,j]  
+            for k in np.arange(j+1,n):  
+                U[i,k] = U[i,k] - L[i,j]*U[j,k]  
+            U[i,j] = 0  
+    
+    L.flatten()
+    U.flatten()
+    A.flatten()
+
+    return L, U
