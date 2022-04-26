@@ -1,25 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-A = np.matrix([[1,2,3],[4,5,6]])
-
 ### decomposição LU
 
-def decompLU(A):  
+A = np.matrix('1,2;3,4')
 
-    U = np.copy(A)  
-    n = np.shape(U)[0]  
-    L = np.eye(n)  
+A.astype(dtype=np.double)
 
-    for j in np.arange(n-1):  
-        for i in np.arange(j+1,n):  
-            L[i,j] = U[i,j]/U[j,j]  
-            for k in np.arange(j+1,n):  
-                U[i,k] = U[i,k] - L[i,j]*U[j,k]  
-            U[i,j] = 0  
-    
-    L.flatten()
-    U.flatten()
-    A.flatten()
+n = A.shape[0]
 
-    return L, U
+U = A.copy()
+
+U.astype(dtype=np.double)
+
+L = np.eye(n,dtype=np.double)
+
+for i in range(n):
+    U[i,i:n] = A[i,i:n]-(np.dot(L[i,1:i],U[1:i,i:n]))
+
+for i in range(n-1):
+    L[(i+1):n,i]= 1/U[i,i]*(A[(i+1):n,i]-(np.dot(L[(i+1):n,1:i],U[1:i,i])))
+print(L)
