@@ -12,11 +12,16 @@ n = A.shape[0]
 U = A.copy()
 
 U.astype(dtype=np.double)
+print(U)
 
 L = np.eye(n,dtype=np.double)
+print(L)
+ 
+# a matriz U não está sendo calculada direito, mas a matriz L está certinha
 
 for i in range(n):
     U[i,i:n] = A[i,i:n]-(np.dot(L[i,1:i],U[1:i,i:n]))
+    print(np.dot(L[i,1:i],U[1:i,i:n]))
 
 for i in range(n-1):
     L[(i+1):n,i]= 1/U[i,i]*(A[(i+1):n,i]-(np.dot(L[(i+1):n,1:i],U[1:i,i])))
