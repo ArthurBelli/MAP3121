@@ -1,4 +1,4 @@
-from typing import List
+
 import numpy as np
 
 
@@ -13,7 +13,7 @@ def LU_to_A(L, U):
     return A
 
 #exercício 2
-def A_to_LU(A):
+def A_to_LU(A) -> List[np.ndarray]:
     dim = A.shape[0]
     L = np.eye(dim, dtype=np.double) #matriz identidade
     U = np.zeros((dim, dim), dtype=np.double)
@@ -103,20 +103,30 @@ def get_w(A):
     return w.T #mesmo raciocínio do vetor v
 
 #ta quebrado ainda, mas vai funfar
-def solve_lin_sys_tridig(LU:List[np.array],A, d): #"main"
+def solve_lin_sys_tridig(A, d): 
+    
     dim = A.shape[0]
     x = np.zeros(dim, dtype=np.double)
     y = np.zeros(dim, dtype=np.double)
 
     y[0]= d[0]
 
-    for i in range (dim):
-        y[i]= d[i] - LU[0][i]*y[i-1]
-
-    x[-1]=y[-1]/LU[1][-1]
+    a,b,c = get_abc(A)
+    u_ii,u_ip1,l_ip1 = A_to_LU_tridig(a,b,c)
     
-    for i in range (dim-2,-1,-1):
-        x[i] = (y[i]-A[2][i]*x[i+1]/LU[1][i])
+     #Ly=d
+     
+    for i in range(1,dim):
+        y[i]=d[i]-l_ip1[i]*y[i-1]
+    
+    #Ux=y
+
+    x[dim-1] = y[dim-1]/u_ii[dim-1]
+
+    for i in range (dim-1,0,-1):
+        x[i]=(y[i]-c[i]*x[i+1])/u_ii[i]
+    
+    print(x)
 
     return x
 
@@ -130,11 +140,9 @@ def solve_lin_sys_cyclic_tridig(A,d):
     v = get_v(A)
     w = get_w (A)
 
-    LU = A_to_LU(T)
+    z_barr = solve_lin_sys_tridig(A,v)
 
-    z_barr = solve_lin_sys_tridig(LU,A,v)
-
-    y_barr = solve_lin_sys_tridig(LU,A,d)
+    y_barr = solve_lin_sys_tridig(A,d)
 
     cn = A[dim][0]
     an = A[0][dim]
@@ -146,4 +154,29 @@ def solve_lin_sys_cyclic_tridig(A,d):
         x[i]=y_barr[i]-x[dim]*z_barr[i]
         
     return x 
+
+def main() -> None:
+
+    A = np.array([[3,0,0],[0,9,0],[0,0,10]])
+    d = np.array([1,2,3])
+
+    A_to_LU(A)
+
+    cyclic = bool (input("Resolver por método cíclico? \n0-Não \n1-Sim" ))
+    dim = int(input ("Digite a dimensão da sua matriz"))
+
+
+
+    
+  
+if __name__ == '__main__':
+    main()
+
+
+
+# testes
+
+#solve_lin_sys_tridig(np.array([[1, 1, 0, 0, 6], [1, 3, 2, 0, 0], [0, 1, 5, 9, 0], [0, 0, 15, 4, 10], [7, 0, 0, 2, 1]]), np.array([1, 1, 1, 1, 1]))
+
+
 
