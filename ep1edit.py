@@ -1,4 +1,6 @@
+from typing import List
 import numpy as np
+
 
 #exercício 1
 def LU_to_A(L, U):
@@ -19,7 +21,11 @@ def A_to_LU(A):
     for i in range(dim):
         U[i, i:] = A[i, i:] - np.dot(L[i, :i], U[:i, i:])
         L[(i+1):, i] = (A[(i+1):, i] - np.dot(L[(i+1):, :], U[:, i]))/U[i,i]
-    return L, U
+    
+    print(U)
+    print()
+    print(L)
+    return [L, U]
 
 #exercício 3
 def A_to_LU_tridig(a, b, c):
@@ -97,14 +103,12 @@ def get_w(A):
     return w.T #mesmo raciocínio do vetor v
 
 #ta quebrado ainda, mas vai funfar
-def solve_lin_sys_tridig(A, d, dim): #"main"
-   
+def solve_lin_sys_tridig(LU:List[np.array],A, d): #"main"
+    dim = A.shape[0]
     x = np.zeros(dim, dtype=np.double)
     y = np.zeros(dim, dtype=np.double)
 
     y[0]= d[0]
-
-    LU = A_to_LU (A)
 
     for i in range (dim):
         y[i]= d[i] - LU[0][i]*y[i-1]
@@ -126,13 +130,11 @@ def solve_lin_sys_cyclic_tridig(A,d):
     v = get_v(A)
     w = get_w (A)
 
-    LUparam = np.reshape(A, dim-1)
+    LU = A_to_LU(T)
 
-    LU = A_to_LU(LUparam)
+    z_barr = solve_lin_sys_tridig(LU,A,v)
 
-    z_barr = solve_lin_sys_tridig(LU,v,dim-1)
-
-    y_barr = solve_lin_sys_tridig(LU,d,dim-1)
+    y_barr = solve_lin_sys_tridig(LU,A,d)
 
     cn = A[dim][0]
     an = A[0][dim]
@@ -140,7 +142,15 @@ def solve_lin_sys_cyclic_tridig(A,d):
 
     x[dim] = (d[dim] - (cn*y_barr[1]) - (an*y_barr[dim-1]))/(bn - (cn*z_barr[1])- an*z_barr[dim-1])
 
-    for i in range(dim-2):
+    for i in range(dim-1):
         x[i]=y_barr[i]-x[dim]*z_barr[i]
         
     return x 
+
+def main() -> None:
+
+    A = np.array([[3,-0.1,-0.2],[0.1,7,-0.3],[0.3,-0.2,10]])
+    A_to_LU(A)
+    
+if __name__ == '__main__':
+    main()
