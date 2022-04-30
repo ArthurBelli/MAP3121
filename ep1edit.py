@@ -106,12 +106,12 @@ def solve_lin_sys_tridig(A, d, dim): #"main"
 
     LU = A_to_LU (A)
 
-    for i in range (n):
+    for i in range (dim):
         y[i]= d[i] - LU[0][i]*y[i-1]
 
     x[-1]=y[-1]/LU[1][-1]
     
-    for i in range (n-2,-1,-1):
+    for i in range (dim-2,-1,-1):
         x[i] = (y[i]-A[2][i]*x[i+1]/LU[1][i])
 
     return x
@@ -126,7 +126,7 @@ def solve_lin_sys_cyclic_tridig(A,d):
     v = get_v(A)
     w = get_w (A)
 
-    LUparam = np.reshape(A, n-1)
+    LUparam = np.reshape(A, dim-1)
 
     LU = A_to_LU(LUparam)
 
@@ -140,7 +140,7 @@ def solve_lin_sys_cyclic_tridig(A,d):
 
     x[dim] = (d[dim] - (cn*y_barr[1]) - (an*y_barr[dim-1]))/(bn - (cn*z_barr[1])- an*z_barr[dim-1])
 
-    for i in range(i-2):
+    for i in range(dim-2):
         x[i]=y_barr[i]-x[dim]*z_barr[i]
         
     return x 
