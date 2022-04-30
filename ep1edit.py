@@ -147,10 +147,3 @@ def solve_lin_sys_cyclic_tridig(A,d):
         
     return x 
 
-def main() -> None:
-
-    A = np.array([[3,-0.1,-0.2],[0.1,7,-0.3],[0.3,-0.2,10]])
-    A_to_LU(A)
-    
-if __name__ == '__main__':
-    main()
