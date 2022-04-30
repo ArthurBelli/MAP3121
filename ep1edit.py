@@ -155,22 +155,7 @@ def solve_lin_sys_cyclic_tridig(A,d):
         
     return x 
 
-def main() -> None:
 
-    A = np.array([[3,0,0],[0,9,0],[0,0,10]])
-    d = np.array([1,2,3])
-
-    A_to_LU(A)
-
-    cyclic = bool (input("Resolver por método cíclico? \n0-Não \n1-Sim" ))
-    dim = int(input ("Digite a dimensão da sua matriz"))
-
-
-
-    
-  
-if __name__ == '__main__':
-    main()
 
 
 
