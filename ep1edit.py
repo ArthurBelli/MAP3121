@@ -133,7 +133,7 @@ def main() -> None:
     solve_lin_sys_tridig(L,U,A,d,dim)
     
     
-
+    #tirei algumas funções que eu achava que não precisava. Por isso, n editei o documento q vc criou no github 
 
 
 
