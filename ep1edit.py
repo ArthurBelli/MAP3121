@@ -1,10 +1,9 @@
-
 import numpy as np
+import math
 
 
-#exercício 1
-def LU_to_A(L, U):
-    dim = L.shape[0]
+def LU_to_A(L, U, dim):
+    
     A = np.zeros((dim, dim), dtype=np.double) #matriz A tem mesma dimensão que as de entrada, mas inicializada com zeros
     for i in range(dim): #iterando as linhas
         for j in range(dim): #iterando as colunas
@@ -12,9 +11,8 @@ def LU_to_A(L, U):
                 A[i][j] += L[i][k]*U[k][j]
     return A
 
-#exercício 2
-def A_to_LU(A) -> List[np.ndarray]:
-    dim = A.shape[0]
+def A_to_LU(A,dim):
+    
     L = np.eye(dim, dtype=np.double) #matriz identidade
     U = np.zeros((dim, dim), dtype=np.double)
 
@@ -25,9 +23,28 @@ def A_to_LU(A) -> List[np.ndarray]:
     print(U)
     print()
     print(L)
-    return [L, U]
 
-#exercício 3
+    L.flatten()
+    U.flatten()
+
+    return L, U
+
+def get_abc(A,dim):
+
+    a = np.zeros(dim,dtype=np.double)
+    b = np.zeros(dim, dtype=np.double)
+    c = np.zeros(dim, dtype=np.double)
+
+    for i in range(dim):
+        for j in range(dim):
+            if i == j:
+                b[i] = A[i][j]
+            elif i - j == 1:
+                a[i] = A[i][j]
+            elif i - j == -1:
+                c[i] = A[i][j]
+    return a, b, c
+
 def A_to_LU_tridig(a, b, c):
     dim = b.shape[0] #número de elementos na diagonal principal é a dimmensão da matriz
     l_ip1 = np.zeros(dim, dtype=np.double) #l_i+1
@@ -40,7 +57,6 @@ def A_to_LU_tridig(a, b, c):
         u_ii[i] = b[i]-l_ip1[i]*c[i-1]
 
     return u_ii, u_ip1, l_ip1
-
 
 def solve_lin_sys(u, u_ip1, l, d):
     #Ly = d
@@ -60,29 +76,24 @@ def solve_lin_sys(u, u_ip1, l, d):
 
     return x
 
-def get_abc(A): #retorna as diagonais em forma de vetor
-    dim = A.shape[0]
-    a = np.zeros(dim, dtype=np.double)
-    b = np.zeros(dim, dtype=np.double)
-    c = np.zeros(dim, dtype=np.double)
+def solve_lin_sys_tridig(L,U,A,d,dim):
 
-    for i in range(dim):
-        for j in range(dim):
-            if i == j:
-                b[i] = A[i][j]
-            elif i - j == 1:
-                a[i] = A[i][j]
-            elif i - j == -1:
-                c[i] = A[i][j]
-    return a, b, c
+    y = np.zeros(dim, dtype=np.double)
+    x = np.zeros(dim, dtype=np.double)
 
-def get_T(A):
-    dim = A.shape[0]-1 #submatriz diagonal principal
-    T = np.zeros((dim, dim), dtype=np.double)
-    for i in range(dim):
-        for j in range(dim):
-            T[i][j] = A[i][j]
-    return T
+    y[0]=d[0]
+
+    a,b,c = get_abc(A,dim)
+
+    for i in range(1,dim):
+       y[i] = d[i]-L[i]*y[i-1]
+
+    x[dim-1] = y[dim-1]/U[dim-1]
+
+    for i in range(dim-2,-1,-1):
+       x[i]=(y[i]-c[i]*x[i+1])/U[i]
+    
+    return(x)
 
 def get_v(A):
     dim = A.shape[0]-1
@@ -90,78 +101,45 @@ def get_v(A):
 
     for i in range(dim):
         v[i] = A[dim][i]
-    
-    return v.T #retornamos a transposta pois desejamos que seja um vetor coluna
 
-def get_w(A):
-    dim = A.shape[0]-1
-    w = np.zeros(dim, dtype=np.double)
+def solve_lin_sys_cyclic_tridig(L,U,A,d,dim):
 
-    for i in range(dim):
-        w[i] = A[i][dim]
+    x = np.zeros(dim,dtype=np.double)
+    y = np.zeros(dim,dtype=np.double)
 
-    return w.T #mesmo raciocínio do vetor v
+    a,b,c = get_abc(A,dim)
 
-#ta quebrado ainda, mas vai funfar
-def solve_lin_sys_tridig(A, d): 
-    
-    dim = A.shape[0]
-    x = np.zeros(dim, dtype=np.double)
-    y = np.zeros(dim, dtype=np.double)
 
-    y[0]= d[0]
+    v = get_v(A)
 
-    a,b,c = get_abc(A)
-    u_ii,u_ip1,l_ip1 = A_to_LU_tridig(a,b,c)
-    
-     #Ly=d
-     
-    for i in range(1,dim):
-        y[i]=d[i]-l_ip1[i]*y[i-1]
-    
-    #Ux=y
+    y_barr = solve_lin_sys_tridig(L,U,A,d,dim-1)
+    z_barr = solve_lin_sys_tridig(L,U,A,v,dim-1)
 
-    x[dim-1] = y[dim-1]/u_ii[dim-1]
+    x[dim-1]=(d[dim-1]-c[dim-1]*y_barr[0]-a[dim-1]*y_barr[dim-2])/(b[dim-1]-c[dim-1]*z_barr[0]-a[dim-1]*z_barr[dim-2])
 
-    for i in range (dim-1,0,-1):
-        x[i]=(y[i]-c[i]*x[i+1])/u_ii[i]
-    
-    print(x)
+    for i in range(dim-2,-1,-1):
+       x[i]=y_barr[i]-x[-1]*z_barr[i]
 
     return x
 
+def main() -> None:
 
-def solve_lin_sys_cyclic_tridig(A,d):
-    dim = A.shape[0]
-    x = np.zeros(dim, dtype=np.double)
-    y = np.zeros(dim-1, dtype=np.double)
+    A = np.array([[1, 1, 0, 0, 6], [1, 3, 2, 0, 0], [0, 1, 5, 9, 0], [0, 0, 15, 4, 10], [7, 0, 0, 2, 1]])
+    d=([1,1,1,1,1])
+    dim=5
 
-    T = get_T(A)
-    v = get_v(A)
-    w = get_w (A)
+    L,U = A_to_LU(A,dim)
 
-    z_barr = solve_lin_sys_tridig(A,v)
-
-    y_barr = solve_lin_sys_tridig(A,d)
-
-    cn = A[dim][0]
-    an = A[0][dim]
-    bn = A[dim][dim]
-
-    x[dim] = (d[dim] - (cn*y_barr[1]) - (an*y_barr[dim-1]))/(bn - (cn*z_barr[1])- an*z_barr[dim-1])
-
-    for i in range(dim-1):
-        x[i]=y_barr[i]-x[dim]*z_barr[i]
-        
-    return x 
+    solve_lin_sys_tridig(L,U,A,d,dim)
+    
+    
 
 
 
 
-
-# testes
-
-#solve_lin_sys_tridig(np.array([[1, 1, 0, 0, 6], [1, 3, 2, 0, 0], [0, 1, 5, 9, 0], [0, 0, 15, 4, 10], [7, 0, 0, 2, 1]]), np.array([1, 1, 1, 1, 1]))
-
+    
+  
+if __name__ == '__main__':
+    main()
 
 
