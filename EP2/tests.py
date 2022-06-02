@@ -43,6 +43,6 @@ if __name__ == "__main__":
     print(f"Para n == 10:\t integral == {gauss_2(f_calota, 0.75, 1, c0, d_calota, 10, *x_w(10))}")
 
     print("\n4.2 Volume de [0, e^(-y^2)] x [-1,1]")
-    print(f"Para n == 6:\t integral == {gauss_2(f_error, -1, 1, c0, d_error, 6, *x_w(6))}")
-    print(f"Para n == 8:\t integral == {gauss_2(f_error, -1, 1, c0, d_error, 8, *x_w(8))}")
-    print(f"Para n == 10:\t integral == {gauss_2(f_error, -1, 1, c0, d_error, 10, *x_w(10))}")
+    print(f"Para n == 6:\t integral == {gauss_2(f_error, 0, 1, c0, d_error, 6, *x_w(6))}")
+    print(f"Para n == 8:\t integral == {gauss_2(f_error, 0, 1, c0, d_error, 8, *x_w(8))}")
+    print(f"Para n == 10:\t integral == {gauss_2(f_error, 0, 1, c0, d_error, 10, *x_w(10))}")

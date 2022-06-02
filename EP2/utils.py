@@ -50,10 +50,10 @@ def f_calota(x, y):
     return 2*np.pi*y
 
 def d_error(x):
-    return np.exp((-1)*x**2)
+    return np.exp((-1)*(x**2))
 
 def f_error(x, y):
-    return 2*np.pi*abs(x)
+    return 2*np.pi*d_error(x)
 
 def exp(x, y=0):
     return np.exp(x)
