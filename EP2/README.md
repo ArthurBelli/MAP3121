@@ -1,4 +1,4 @@
-# EP1 - MAP3121 - Fórmulas de Integração Numérica de Gauss
+# EP2 - MAP3121 - Fórmulas de Integração Numérica de Gauss
 
 O presente programa foi desenvolvido inteira e exclusivamente por Arthur Pedroso Porto Belli e Letícia Harumi Furusawa para o primeiro oferecimento da disciplina MAP3121 - Métodos Numéricos e Aplicações de 2022.
 
