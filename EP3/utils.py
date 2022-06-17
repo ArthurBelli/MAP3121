@@ -1,6 +1,6 @@
 '''
 Como dependemos de funções implementadas nos outros EPs, 
-as funções necessárias foram copiadas para esse arquivo a 
+as funções necessárias foram copiadas e, a depender do caso, adaptadas para esse arquivo a 
 fim de facilitar a importação das funcionalidades sem a necessidade 
 de se ter os arquivos originais no mesmo diretório
 '''
@@ -295,14 +295,17 @@ def gauss(f, a, b, n, x, w):
     return sum
 
 
+#foi necessário alterar a função, modo que agora ela recebe a função envelope f, a função a ser passada para f (g) e o modo de operação, 
+#que determina se deve ser utilizado x_{i-1} ou x_{i+1}
 
-def gauss_2(f, a, b, c, d, n, x, w):
+def gauss_2(f, g, a, b, c, d, n, nos, pesos, mode):
     '''
-    integração dupla no intervalo [a,b] x [c(x_i), d(x_i)] da função f(x, y) com n nós (x) e pesos (w)
+    integração dupla no intervalo [a,b] x [c(x_i), d(x_i)] da função f(x, y) com n nós (x) e pesos (w).
+    No caso do EP3, nossas funções são unidimensionais, ou seja, dependem apenas de x
     '''
     linear_scaling_ext, linear_transposition_ext = find_lin_scale_transp(a, b) # fatores de correção para a integral externa
-    pesos_ext = [linear_scaling_ext*w[i] for i in range(n)] # pesos da integral externa
-    nos_ext = [(linear_scaling_ext*x[i]+linear_transposition_ext) for i in range(n)] # nós da integração externa
+    pesos_ext = [linear_scaling_ext*pesos[i] for i in range(n)] # pesos da integral externa
+    nos_ext = [(linear_scaling_ext*nos[i]+linear_transposition_ext) for i in range(n)] # nós da integração externa
 
     sum_ext = 0
     for i in range(n): #para cada nó externo, definiremos o intervalo de integração, seus nós e seus pesos
@@ -310,12 +313,15 @@ def gauss_2(f, a, b, c, d, n, x, w):
         b_int = d(nos_ext[i]) # extremo superior de integração interno a cada iteração
 
         linear_scaling_int, linear_transposition_int = find_lin_scale_transp(a_int, b_int) # fatores de correção para a integral interna a cada iteração
-        pesos_int = [linear_scaling_int*w[i] for i in range(n)] # pesos da integral interna
-        nos_int = [linear_scaling_int*x[i]+linear_transposition_int for i in range(n)] # nós da integral interna
+        pesos_int = [linear_scaling_int*pesos[i] for i in range(n)] # pesos da integral interna
+        nos_int = [linear_scaling_int*nos[i]+linear_transposition_int for i in range(n)] # nós da integral interna
         
         sum_int = 0
         for j in range(n):
-            sum_int += pesos_int[j]*f(nos_ext[i], nos_int[j])
+            if mode == "inf":
+                sum_int += pesos_int[j]*f(g, nos_ext[i], nos_int[j], c) #principal alteração de funcionalidade
+            else:
+                sum_int += pesos_int[j]*f(g, nos_ext[i], nos_int[j], d)
         sum_ext += pesos_ext[i]*sum_int
     
     return sum_ext
