@@ -21,10 +21,13 @@ def q(x):
 
 
 
+'''
+primeira implementação, estou tentando resolver o caso mais simples
+L = 1, k(x)=1, q(x)=0
+'''
 
-
-def fem(L, n):
-    h = L/(n+1)
+def fem(n):
+    h = 1/(n+1) #passo dos apoios
     x = np.array([i*h for i in range(n+1)], dtype=np.double)
 
     #definição da matriz normal do MMQ 
@@ -35,6 +38,13 @@ def fem(L, n):
     # vetor de termos independentes
     #imagino que tenha q usar expressão lambda, mas n sei se a implementação ta certa, vou dar uma pesquisada no fim de semana
     d = [(1/h)*(gauss_2((lambda x:f(x))*((lambda x:x)-x[i-1]), 0, 1, x[i-1], x[i], 10, *x_w(10))+gauss_2((lambda x: f(x))*(x[i+1]- (lambda x:x), 0, 1, x[i], x[i+1], 10, *x_w(10)))) for i in range(1, n)]
+    d = np.array(d, dtype=np.double)
+
+    #resolução do sistema linear
+    alphas = np.array(solve_lin_sys_tridiag(*A_to_LU_tridig(a, b, c), d), dtype=np.double)
+
+
+
 
 
 def solve():
