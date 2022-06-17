@@ -8,8 +8,20 @@ import numpy as np
 from MAP3121.EP3.utils import *#contém as funções inalteradas de EPs passados
 
 # função de excitação do sistema
-def f(x, y):
+def f(x, y=0):
     return 12*x*(1-x)-2
+
+def phi_i1(y, x): #y é a variável independente, x é o array de pontos e i é o índice desejado
+    return (y-x) #expressão para o trecho [x_{i-1}, x_i]
+
+def phi_i2(y, x):
+    return (x-y) # expressão de \phi para o trecho [x_i, x_{i+1}]
+
+def funcao1(f, y, z, x): #funcao a ser integrada deduzidda na secção de exercícios do relatório
+    return f(y)*phi_i1(y, x)
+
+def funcao2(f, y, z, x): #para serem compatíveis com o código desenvolvido para o EP2, precisamos de duas vars. independentes (y, z)
+    return f(y)*phi_i2(y, x)
 
 # condutividade térmica
 def k(x):
@@ -23,7 +35,7 @@ def q(x):
 
 '''
 primeira implementação, estou tentando resolver o caso mais simples
-L = 1, k(x)=1, q(x)=0
+L = 1 k(x)=1 q(x)=0
 '''
 
 def fem(n):
@@ -35,9 +47,9 @@ def fem(n):
     b = np.array([2/h for i in range(n)], dtype=np.double) #diagonal principal
     c = np.array([0 if i == n-1 else (-1)*(1/h) for i in range(n)], dtype=np.double) #diagonal superior
 
-    # vetor de termos independentes
-    #imagino que tenha q usar expressão lambda, mas n sei se a implementação ta certa, vou dar uma pesquisada no fim de semana
-    d = [(1/h)*(gauss_2((lambda x:f(x))*((lambda x:x)-x[i-1]), 0, 1, x[i-1], x[i], 10, *x_w(10))+gauss_2((lambda x: f(x))*(x[i+1]- (lambda x:x), 0, 1, x[i], x[i+1], 10, *x_w(10)))) for i in range(1, n)]
+    #array de termos independentes
+    #putaria do krl q eu tive q fazer aqui pra funcionar, mas acho q funciona.....
+    d = [(1/h)*(gauss_2((funcao1, f, 0, 1, x[i-1], x[i], 10, *x_w(10), "inf") + gauss_2(funcao2, f, 0, 1, x[i], x[i+1], 10, *x_w(10), "sup"))) for i in range(1, n)]
     d = np.array(d, dtype=np.double)
 
     #resolução do sistema linear
