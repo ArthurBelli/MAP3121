@@ -68,3 +68,7 @@ def gauss(f, lim_inf, lim_sup, n, nos, pesos):
         sum += v[i]*f(y[i])
 
     return sum
+
+
+def gabarito(x):
+    return (x**2)*(1-x)**2
